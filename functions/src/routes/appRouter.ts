@@ -10,14 +10,15 @@ const catchError = (err: any, res: any) => {
   res.status(500).json({ message: "internal server error" });
 };
 
-appRouter.get("/", async (req, res) => {
-  const client = await getClient();
-  const results = await client
-    .db()
-    .collection<appRouter>("appRouters")
-    .find()
-    .toArray();
-  res.json(results);
+appRouter.get("/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const client = await getClient();
+    const results = client.db().collection<Game>("gamelist").find({ uid: id });
+    res.json(await results.toArray());
+  } catch (err) {
+    catchError(err, res);
+  }
 });
 
 appRouter.post("/", async (req, res) => {
@@ -30,4 +31,5 @@ appRouter.post("/", async (req, res) => {
     catchError(err, res);
   }
 });
+
 export default appRouter;
