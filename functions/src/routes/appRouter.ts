@@ -24,7 +24,7 @@ appRouter.post("/", async (req, res) => {
   const newSavedGame: Game = req.body;
   try {
     const client = await getClient();
-    await client.db().collection<Game>("gamelist").insertOne(req.body);
+    await client.db().collection<Game>("gamelist").insertOne(newSavedGame);
     res.status(201).json(newSavedGame);
   } catch (err) {
     catchError(err, res);
