@@ -47,4 +47,32 @@ appRouter.delete("/:id", async (req, res) => {
   }
 });
 
+appRouter.get("/recommend/:uid", async (req, res) => {
+  const uid = req.params.uid;
+  try {
+    const client = await getClient();
+    const results = client
+      .db()
+      .collection<Game>("gamelist")
+      .aggregate([
+        {
+          $group: {
+            _id: "$uid",
+            avgAge: { $avg: "$min_age" },
+            avgMaxPlayer: { $avg: "$max_players" },
+            avgMinPlayer: { $avg: "$min_players" },
+            avgMaxPlaytime: { $avg: "$max_playtime" },
+            avgMinPlaytime: { $avg: "$min_playtime" },
+            avgPrice: { $avg: "$price" },
+          },
+        },
+        { $match: { _id: uid } },
+      ]);
+
+    res.json(await results.toArray());
+  } catch (err) {
+    catchError(err, res);
+  }
+});
+
 export default appRouter;
